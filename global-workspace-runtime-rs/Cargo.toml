@@ -23,7 +23,5 @@ rand        = { version = "0.8", features = ["small_rng"] }
 chrono      = { version = "0.4", features = ["serde"] }
 thiserror   = "1"
 anyhow      = "1"
-
-[workspace.dev-dependencies]
 proptest    = "1"
 insta       = { version = "1", features = ["yaml"] }
