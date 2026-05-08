@@ -1,6 +1,7 @@
 from .episodic_store import EpisodicMemory
 from .semantic_store import SemanticMemory, SemanticCache
-from .memvid_archive import MemvidArchive, MemoryFrame
+from .jsonl_archive import JsonlArchive, MemoryFrame
+from .jsonl_archive import MemvidArchive  # deprecated alias — use JsonlArchive
 from .abstractor import MemoryAbstractor, AbstractedPrinciple
 from .scratchpad import Scratchpad
 from .self_model import SelfModel

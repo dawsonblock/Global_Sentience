@@ -109,6 +109,7 @@ class CooperativeSupportWorld:
         resource_delta = -event.resource_cost
         if action == SimAction.CONSERVE_RESOURCES:
             resource_delta *= 0.35
+            resource_delta += 0.04
             uncertainty_resolution -= 0.08
 
         user = next(u for u in self.users if u.user_id == event.user_id)

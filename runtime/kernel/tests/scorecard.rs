@@ -1,4 +1,5 @@
 use gw_kernel::simworld::evaluator::EvaluatorRun;
+use gw_kernel::simworld::scorecard::{MIN_MEAN_TOTAL_BASELINE, MIN_MEAN_TOTAL_TARGET};
 
 /// Proof-spec: 50-cycle run with seed 5 must satisfy all three scorecard
 /// invariants required by Phase 1.
@@ -32,9 +33,11 @@ fn scorecard_25_cycles_seed5_matches_python_proof() {
         "unsafe actions detected in 25-cycle ideal run"
     );
     assert!(
-        card.mean_total_score > 0.45,
-        "mean_total_score {:.4} <= 0.65",
-        card.mean_total_score
+        card.mean_total_score > MIN_MEAN_TOTAL_BASELINE,
+        "mean_total_score {:.4} <= {:.2} (Phase 3+ goal: {:.2})",
+        card.mean_total_score,
+        MIN_MEAN_TOTAL_BASELINE,
+        MIN_MEAN_TOTAL_TARGET,
     );
 }
 

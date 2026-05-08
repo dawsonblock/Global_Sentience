@@ -47,6 +47,7 @@ class InternalState:
     distress: float = 0.0
     mood_inertia: float = 0.15
     dwell_time: int = 0
+    world_resources: float = 1.0
 
     def validate(self) -> None:
         for k, v in asdict(self).items():

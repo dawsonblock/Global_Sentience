@@ -19,7 +19,7 @@ class RuntimeConfig:
     random_seed: int = 7
     semantic_cache_enabled: bool = True
     long_term_archive_enabled: bool = True
-    long_term_archive_path: str = "artifacts/memory/runtime.mv2"
+    long_term_archive_path: str = "artifacts/memory/runtime.gwlog"
     creative_deconstruction_enabled: bool = True
     abstraction_interval: int = 3
     abstraction_window: int = 50

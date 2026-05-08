@@ -51,8 +51,8 @@ class AsyncGlobalWorkspaceRuntime:
         random.seed(self.config.random_seed)
         self.state = state or RuntimeState()
         if self.config.long_term_archive_path:
-            from ..memory import MemvidArchive
-            self.state.long_term_archive = MemvidArchive(self.config.long_term_archive_path)
+            from ..memory import JsonlArchive
+            self.state.long_term_archive = JsonlArchive(self.config.long_term_archive_path)
         self.llm = LLMAdapter(mode="mock")
         self.analytic = AnalyticStream(self.llm)
         self.associative = AssociativeStream(self.llm)

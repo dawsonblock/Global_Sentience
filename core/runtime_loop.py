@@ -21,8 +21,8 @@ class GlobalWorkspaceRuntime:
         random.seed(self.config.random_seed)
         self.state = state or RuntimeState()
         if self.config.long_term_archive_path:
-            from ..memory import MemvidArchive
-            self.state.long_term_archive = MemvidArchive(self.config.long_term_archive_path)
+            from ..memory import JsonlArchive
+            self.state.long_term_archive = JsonlArchive(self.config.long_term_archive_path)
         self.llm = LLMAdapter(mode="mock")
         self.analytic = AnalyticStream(self.llm)
         self.associative = AssociativeStream(self.llm)
@@ -64,6 +64,8 @@ class GlobalWorkspaceRuntime:
         state.threat = clamp01(state.threat + max(0.0, -trust_delta) * 0.8 + cold_penalty * 0.4 - repair_success * 0.08)
         state.kindness = clamp01(state.kindness - cold_penalty * 0.25 + max(0.0, trust_delta) * 0.2 + repair_success * 0.05)
         state.resource_pressure = clamp01(state.resource_pressure + max(0.0, -resource_delta) * 0.15)
+        world_resources = float(outcome.get("world_resources", state.world_resources))
+        state.world_resources = clamp01(world_resources)
         state.control = clamp01(state.control + 0.05 * repair_success - 0.08 * cold_penalty)
         state.validate()
 

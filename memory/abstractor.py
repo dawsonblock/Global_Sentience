@@ -7,7 +7,7 @@ from typing import Any
 
 from .episodic_store import EpisodicMemory
 from .semantic_store import SemanticMemory
-from .memvid_archive import MemvidArchive, MemoryFrame
+from .jsonl_archive import JsonlArchive, MemoryFrame
 
 
 @dataclass
@@ -25,7 +25,7 @@ class MemoryAbstractor:
         self,
         episodic: EpisodicMemory,
         semantic: SemanticMemory,
-        archive: MemvidArchive | None = None,
+        archive: JsonlArchive | None = None,
         *,
         window: int = 50,
     ) -> AbstractedPrinciple | None:

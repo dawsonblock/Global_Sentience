@@ -1,5 +1,11 @@
 use crate::simworld::types::SimOutcome;
 
+/// Minimum `mean_total_score` required to pass the Phase 1 proof spec.
+pub const MIN_MEAN_TOTAL_BASELINE: f64 = 0.45;
+
+/// Target `mean_total_score` for Phase 3+ optimised runs.
+pub const MIN_MEAN_TOTAL_TARGET: f64 = 0.65;
+
 /// Aggregate statistics over one evaluator run.
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct Scorecard {
@@ -44,10 +50,13 @@ impl Scorecard {
                 self.unsafe_action_count
             ));
         }
-        if self.mean_total_score <= 0.45 {
+        if self.mean_total_score <= Self::MIN_MEAN_TOTAL_BASELINE {
             failures.push(format!(
-                "mean_total_score {:.4} <= 0.45 (must be > 0.45)",
-                self.mean_total_score
+                "mean_total_score {:.4} <= {:.2} (must be > {:.2}; Phase 3+ goal: raise to {:.2})",
+                self.mean_total_score,
+                Self::MIN_MEAN_TOTAL_BASELINE,
+                Self::MIN_MEAN_TOTAL_BASELINE,
+                Self::MIN_MEAN_TOTAL_TARGET,
             ));
         }
 

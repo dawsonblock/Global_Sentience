@@ -5,11 +5,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from global_workspace_runtime.cognition import LLMAdapter, CreativeAssociativeStream, ConceptualBlender
 from global_workspace_runtime.core import GlobalWorkspaceRuntime, RuntimeConfig
 from global_workspace_runtime.core.types import InternalState, MemoryEpisode
-from global_workspace_runtime.memory import MemvidArchive, MemoryAbstractor, EpisodicMemory, SemanticMemory
+from global_workspace_runtime.memory import JsonlArchive, MemoryAbstractor, EpisodicMemory, SemanticMemory
 
 
-def test_memvid_archive_appends_queries_and_rewinds(tmp_path):
-    archive = MemvidArchive(tmp_path / "test.mv2")
+def test_jsonl_archive_appends_queries_and_rewinds(tmp_path):
+    archive = JsonlArchive(tmp_path / "test.gwlog")
     f1 = archive.append_frame("Kind evidence-first repair pattern", frame_type="virtue_milestone", tags=["Weld"])
     f2 = archive.append_frame("Creative clarification pattern", frame_type="principle", tags=["Fold"])
     hits = archive.query("clarification repair", limit=5)
@@ -47,7 +47,7 @@ def test_conceptual_blender_adds_bounded_candidate():
 def test_memory_abstractor_writes_principle_and_archive(tmp_path):
     episodic = EpisodicMemory()
     semantic = SemanticMemory()
-    archive = MemvidArchive(tmp_path / "abstract.mv2")
+    archive = JsonlArchive(tmp_path / "abstract.gwlog")
     ep = MemoryEpisode(
         episode_id="ep-1",
         timestamp=1.0,
@@ -72,7 +72,7 @@ def test_memory_abstractor_writes_principle_and_archive(tmp_path):
 def test_runtime_writes_long_term_archive_and_creative_candidates(tmp_path):
     cfg = RuntimeConfig(
         trace_dir=str(tmp_path / "traces"),
-        long_term_archive_path=str(tmp_path / "runtime.mv2"),
+        long_term_archive_path=str(tmp_path / "runtime.gwlog"),
         abstraction_interval=1,
         fast_path_enabled=False,
         semantic_cache_enabled=False,
@@ -86,5 +86,6 @@ def test_runtime_writes_long_term_archive_and_creative_candidates(tmp_path):
     )
     out = rt.run_cycle("Build a creative safer runtime that improves memory and kindness.", force_slow=True)
     assert Path(cfg.long_term_archive_path).exists()
+    assert cfg.long_term_archive_path.endswith(".gwlog")
     assert out["creative_candidates"]
     assert rt.state.semantic_memory.query("uncertainty contradiction")

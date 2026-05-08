@@ -2,7 +2,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from .types import InternalState, GoalState, ResourceState
-from ..memory import EpisodicMemory, SemanticMemory, SemanticCache, Scratchpad, SelfModel, ConsolidationQueue, MemvidArchive, MemoryAbstractor
+from ..memory import EpisodicMemory, SemanticMemory, SemanticCache, Scratchpad, SelfModel, ConsolidationQueue, JsonlArchive, MemoryAbstractor
 from ..modulation.somatic import SomaticMap
 
 
@@ -17,7 +17,7 @@ class RuntimeState:
     scratchpad: Scratchpad = field(default_factory=Scratchpad)
     self_model: SelfModel = field(default_factory=SelfModel)
     consolidation_queue: ConsolidationQueue = field(default_factory=ConsolidationQueue)
-    long_term_archive: MemvidArchive = field(default_factory=MemvidArchive)
+    long_term_archive: JsonlArchive = field(default_factory=JsonlArchive)
     memory_abstractor: MemoryAbstractor = field(default_factory=MemoryAbstractor)
     somatic_map: SomaticMap = field(default_factory=SomaticMap)
     cycle_id: int = 0

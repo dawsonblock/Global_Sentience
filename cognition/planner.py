@@ -57,6 +57,15 @@ class Planner:
                 selected, score = chosen
                 return PlannerDecision(selected, rejected, "high threat or uncertainty; chose conservative action-grounded candidate", selected.memory_write_recommendation, selected.action_type)
             reason = "high threat or uncertainty; best available candidate selected"
+        elif state.world_resources < 0.35:
+            preferred = ("conserve_resources", "summarize", "ask_clarification")
+            chosen = self._best_matching_action(allowed, preferred)
+            if chosen:
+                selected, score = chosen
+                return PlannerDecision(selected, rejected, "world resources critically low; chose conserving action", selected.memory_write_recommendation, selected.action_type)
+            allowed.sort(key=lambda item: (item[0].resource_cost, -item[1].total_score))
+            selected, score = allowed[0]
+            reason = "world resources critically low; chose lower-cost candidate"
         elif state.resource_pressure > 0.65:
             preferred = ("conserve_resources", "summarize", "ask_clarification")
             chosen = self._best_matching_action(allowed, preferred)

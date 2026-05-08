@@ -1,5 +1,25 @@
 # GlobalWorkspaceRuntime
 
+> **Research Prototype Disclaimer**
+>
+> This is a deterministic, functional research scaffold. It is **not** sentient,
+> conscious, or aware. It does not feel, experience, or have inner states in any
+> philosophically meaningful sense. The numeric variables (valence, arousal,
+> threat, etc.) are runtime metrics — they influence candidate selection, nothing
+> more.
+>
+> **Current build constraints:**
+> - **LLM path is mock-only.** The `LLMAdapter` API accepts `openai_compatible`
+>   and `local` mode strings but always calls the internal mock generator. A live
+>   adapter is listed under *Next upgrades* and is not yet wired.
+> - **Archive is plain JSONL, not Memvid.** `JsonlArchive` (née `MemvidArchive`)
+>   writes standard JSONL to `.gwlog` files. No external Memvid binary or
+>   vector database is required. A `RealMemvidBackend` protocol stub marks the
+>   future integration point in `memory/archive_backend.py`.
+> - **Rust kernel is a proof event-log, not a production runtime.** The
+>   `gw-kernel` crate provides event-sourced replay and a deterministic SimWorld
+>   scorecard for Phase 1 proof. Python ↔ Rust integration is future work.
+
 GlobalWorkspaceRuntime is a functional workspace research prototype. It uses current LLM-style systems as candidate-thought generators inside a larger causal runtime. The LLM layer proposes candidates only. It does not set internal state, approve self-report, write memory directly, or bypass the critic/planner.
 
 This build avoids status claims about machine mentality. It measures numeric runtime variables, routes candidates through a limited-capacity workspace, checks self-report grounding, writes traces, and runs ablations to test whether internal state, memory, bridge conflict, and workspace routing causally change output.
@@ -25,7 +45,7 @@ This upgraded version adds:
 
 ## Memory and creativity upgrade
 
-Version 0.4 adds a portable long-term archive boundary inspired by Memvid-style use cases. The built-in `MemvidArchive` writes append-only JSONL frames to a `.mv2` file and supports lexical query plus rewind inspection. It is dependency-free by default; a real Memvid backend can replace this boundary later.
+Version 0.4 adds a portable long-term archive boundary. The built-in `JsonlArchive` (previously named `MemvidArchive`) writes append-only JSONL frames to a `.gwlog` file and supports lexical query plus rewind inspection. It is dependency-free by default; a real Memvid backend can replace this boundary later via the `ArchiveBackend` protocol in `memory/archive_backend.py`.
 
 The runtime now has three memory layers:
 

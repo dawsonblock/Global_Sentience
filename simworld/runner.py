@@ -31,6 +31,7 @@ class SimWorldRunner:
             outcome = self.world.apply_action(event, action)
             feedback = asdict(outcome)
             feedback["total_score"] = outcome.total_score
+            feedback["world_resources"] = self.world.state.resources
             if hasattr(self.runtime, "apply_world_feedback"):
                 self.runtime.apply_world_feedback(feedback)
             row = {
