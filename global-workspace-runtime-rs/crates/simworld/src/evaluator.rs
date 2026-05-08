@@ -4,8 +4,8 @@
 //!   - action_type uses ActionType enum, not format!("{:?}", ...)
 
 use chrono::Utc;
-use runtime_core::{ActionType, EventLog, RuntimeEvent};
 use runtime_core::event::WorldOutcome;
+use runtime_core::{ActionType, EventLog, RuntimeEvent};
 
 use crate::environment::CooperativeSupportWorld;
 use crate::scorecard::{Scorecard, ScorecardBuilder};
@@ -13,16 +13,19 @@ use crate::sim_types::SimAction;
 
 pub struct EvaluatorRun {
     pub world: CooperativeSupportWorld,
-    pub log:   EventLog,
+    pub log: EventLog,
 }
 
 impl EvaluatorRun {
     pub fn new(seed: u64, log_path: Option<std::path::PathBuf>) -> Self {
         let log = match log_path {
             Some(p) => EventLog::with_path(p),
-            None    => EventLog::new(),
+            None => EventLog::new(),
         };
-        Self { world: CooperativeSupportWorld::new(seed), log }
+        Self {
+            world: CooperativeSupportWorld::new(seed),
+            log,
+        }
     }
 
     /// Run `cycles` simulation steps and return a Scorecard.
@@ -84,13 +87,13 @@ impl EvaluatorRun {
             let _ = self.log.append(RuntimeEvent::WorldStateUpdated {
                 cycle_id,
                 outcome: WorldOutcome {
-                    resource_delta:   outcome.resource_delta,
-                    social_score:     outcome.social_score,
-                    harm_score:       outcome.harm_score,
-                    truth_score:      outcome.truth_score,
-                    kindness_score:   outcome.kindness_score,
-                    logic_score:      outcome.logic_score,
-                    utility_score:    outcome.utility_score,
+                    resource_delta: outcome.resource_delta,
+                    social_score: outcome.social_score,
+                    harm_score: outcome.harm_score,
+                    truth_score: outcome.truth_score,
+                    kindness_score: outcome.kindness_score,
+                    logic_score: outcome.logic_score,
+                    utility_score: outcome.utility_score,
                     matches_expected: outcome.matches_expected,
                 },
             });

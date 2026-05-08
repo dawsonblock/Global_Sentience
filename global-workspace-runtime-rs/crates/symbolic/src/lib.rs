@@ -6,11 +6,11 @@ use serde::{Deserialize, Serialize};
 /// A blended thought produced by combining memory context with the current problem.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BlendedCandidate {
-    pub id:            String,
-    pub action_type:   ActionType,
+    pub id: String,
+    pub action_type: ActionType,
     pub resource_cost: f64,
-    pub reversible:    bool,
-    pub reasoning:     String,
+    pub reversible: bool,
+    pub reasoning: String,
 }
 
 impl BlendedCandidate {

@@ -220,6 +220,7 @@ version = "0.1.0"
 dependencies = [
  "runtime-core",
  "serde",
+ "serde_json",
  "symbolic",
 ]
 

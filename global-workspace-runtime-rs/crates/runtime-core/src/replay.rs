@@ -7,7 +7,7 @@ use crate::runtime_state::RuntimeState;
 
 /// Replay a slice of events from an initial default state.
 pub fn replay(events: &[RuntimeEvent]) -> RuntimeState {
-    events.iter().fold(RuntimeState::default(), |s, e| reduce(s, e))
+    events.iter().fold(RuntimeState::default(), reduce)
 }
 
 /// Replay everything in an EventLog.

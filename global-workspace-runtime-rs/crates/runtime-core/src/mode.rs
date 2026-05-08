@@ -15,12 +15,12 @@ pub enum RuntimeMode {
 impl RuntimeMode {
     pub fn as_str(&self) -> &'static str {
         match self {
-            Self::Normal          => "Normal",
-            Self::MemoryDegraded  => "MemoryDegraded",
-            Self::ModelDegraded   => "ModelDegraded",
+            Self::Normal => "Normal",
+            Self::MemoryDegraded => "MemoryDegraded",
+            Self::ModelDegraded => "ModelDegraded",
             Self::ArchiveReadOnly => "ArchiveReadOnly",
-            Self::SimulationOnly  => "SimulationOnly",
-            Self::SafeMode        => "SafeMode",
+            Self::SimulationOnly => "SimulationOnly",
+            Self::SafeMode => "SafeMode",
         }
     }
 }
@@ -35,13 +35,13 @@ impl std::str::FromStr for RuntimeMode {
     type Err = String;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "Normal"          => Ok(Self::Normal),
-            "MemoryDegraded"  => Ok(Self::MemoryDegraded),
-            "ModelDegraded"   => Ok(Self::ModelDegraded),
+            "Normal" => Ok(Self::Normal),
+            "MemoryDegraded" => Ok(Self::MemoryDegraded),
+            "ModelDegraded" => Ok(Self::ModelDegraded),
             "ArchiveReadOnly" => Ok(Self::ArchiveReadOnly),
-            "SimulationOnly"  => Ok(Self::SimulationOnly),
-            "SafeMode"        => Ok(Self::SafeMode),
-            other             => Err(format!("unknown RuntimeMode: {other}")),
+            "SimulationOnly" => Ok(Self::SimulationOnly),
+            "SafeMode" => Ok(Self::SafeMode),
+            other => Err(format!("unknown RuntimeMode: {other}")),
         }
     }
 }

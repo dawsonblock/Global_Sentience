@@ -16,7 +16,7 @@ pub enum EventLogError {
 #[derive(Debug, Default, Clone)]
 pub struct EventLog {
     events: Vec<RuntimeEvent>,
-    path:   Option<PathBuf>,
+    path: Option<PathBuf>,
 }
 
 impl EventLog {
@@ -25,14 +25,20 @@ impl EventLog {
     }
 
     pub fn with_path(path: PathBuf) -> Self {
-        Self { events: Vec::new(), path: Some(path) }
+        Self {
+            events: Vec::new(),
+            path: Some(path),
+        }
     }
 
     /// Append one event.  If a path is set, also writes it to the file.
     pub fn append(&mut self, event: RuntimeEvent) -> Result<(), EventLogError> {
         if let Some(ref p) = self.path {
             let line = serde_json::to_string(&event)?;
-            let mut f = std::fs::OpenOptions::new().create(true).append(true).open(p)?;
+            let mut f = std::fs::OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open(p)?;
             writeln!(f, "{}", line)?;
         }
         self.events.push(event);
@@ -66,7 +72,9 @@ impl EventLog {
         let mut log = Self::new();
         for line in s.lines() {
             let line = line.trim();
-            if line.is_empty() { continue; }
+            if line.is_empty() {
+                continue;
+            }
             let ev: RuntimeEvent = serde_json::from_str(line)?;
             log.events.push(ev);
         }
@@ -81,13 +89,15 @@ impl EventLog {
             "EventLog::load requires a .gwlog file, got: {}",
             path.display()
         );
-        let f  = std::fs::File::open(path)?;
+        let f = std::fs::File::open(path)?;
         let rdr = BufReader::new(f);
         let mut log = Self::new();
         for line in rdr.lines() {
             let line = line?;
             let line = line.trim();
-            if line.is_empty() { continue; }
+            if line.is_empty() {
+                continue;
+            }
             let ev: RuntimeEvent = serde_json::from_str(line)?;
             log.events.push(ev);
         }

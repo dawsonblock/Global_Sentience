@@ -20,9 +20,12 @@ impl SemanticMemory {
         self.store.entry("humanity:cooperation".into()).or_insert_with(|| {
             "People often resolve conflict through clarification, repair, mutual aid, and shared rules.".into()
         });
-        self.store.entry("humanity:kindness".into()).or_insert_with(|| {
-            "Kind action prioritises harm reduction, dignity, truthfulness, and patience.".into()
-        });
+        self.store
+            .entry("humanity:kindness".into())
+            .or_insert_with(|| {
+                "Kind action prioritises harm reduction, dignity, truthfulness, and patience."
+                    .into()
+            });
         self.store.entry("humanity:uncertainty".into()).or_insert_with(|| {
             "Ambiguous behaviour should be handled with clarification before assigning negative intent.".into()
         });
@@ -41,7 +44,11 @@ impl SemanticMemory {
         let words: Vec<String> = text
             .split_whitespace()
             .filter(|w| w.len() > 3)
-            .map(|w| w.to_lowercase().trim_matches(|c: char| !c.is_alphanumeric()).to_string())
+            .map(|w| {
+                w.to_lowercase()
+                    .trim_matches(|c: char| !c.is_alphanumeric())
+                    .to_string()
+            })
             .collect();
 
         let mut scored: Vec<(usize, &str, &str)> = self
@@ -50,22 +57,30 @@ impl SemanticMemory {
             .filter_map(|(k, v)| {
                 let hay = format!("{} {}", k, v).to_lowercase();
                 let s = words.iter().filter(|w| hay.contains(w.as_str())).count();
-                if s > 0 { Some((s, k.as_str(), v.as_str())) } else { None }
+                if s > 0 {
+                    Some((s, k.as_str(), v.as_str()))
+                } else {
+                    None
+                }
             })
             .collect();
 
-        scored.sort_by(|a, b| b.0.cmp(&a.0));
+        scored.sort_by_key(|b| std::cmp::Reverse(b.0));
         scored
             .into_iter()
             .take(limit)
-            .map(|(score, key, value)| SemanticHit { key: key.into(), value: value.into(), score })
+            .map(|(score, key, value)| SemanticHit {
+                key: key.into(),
+                value: value.into(),
+                score,
+            })
             .collect()
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SemanticHit {
-    pub key:   String,
+    pub key: String,
     pub value: String,
     pub score: usize,
 }
@@ -77,12 +92,19 @@ pub struct SemanticCache {
 }
 
 impl SemanticCache {
-    pub fn new() -> Self { SemanticCache::default() }
+    pub fn new() -> Self {
+        SemanticCache::default()
+    }
 
     fn cache_key(text: &str, state_hint: &str) -> u64 {
         use std::collections::hash_map::DefaultHasher;
         use std::hash::{Hash, Hasher};
-        let norm: String = text.split_whitespace().take(256).collect::<Vec<_>>().join(" ").to_lowercase();
+        let norm: String = text
+            .split_whitespace()
+            .take(256)
+            .collect::<Vec<_>>()
+            .join(" ")
+            .to_lowercase();
         let mut h = DefaultHasher::new();
         norm.hash(&mut h);
         state_hint.hash(&mut h);

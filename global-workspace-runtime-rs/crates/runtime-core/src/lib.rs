@@ -14,6 +14,6 @@ pub use event::RuntimeEvent;
 pub use event_log::EventLog;
 pub use mode::RuntimeMode;
 pub use reducer::reduce;
-pub use replay::{replay, replay_log, replay_jsonl};
+pub use replay::{replay, replay_jsonl, replay_log};
 pub use runtime_state::RuntimeState;
 pub use types::{InternalState, Observation, ResonanceEntry, ResonanceTag};

@@ -1,19 +1,19 @@
 //! Planner: select best action from a scored packet.
 //! Implements the 8-step decision tree from cognition/planner.py.
 
-use runtime_core::{ActionType, InternalState};
-use modulation::SomaticMap;
 use crate::candidate::CandidatePacket;
+use modulation::SomaticMap;
+use runtime_core::{ActionType, InternalState};
 
 pub struct Planner;
 
 impl Planner {
     /// Select the best action given current state, somatic map, and candidates.
     pub fn select(
-        state:      &InternalState,
-        somatic:    &SomaticMap,
-        packet:     &CandidatePacket,
-        allowed:    &[ActionType],
+        state: &InternalState,
+        somatic: &SomaticMap,
+        packet: &CandidatePacket,
+        allowed: &[ActionType],
     ) -> ActionType {
         let passing: Vec<&crate::candidate::ThoughtCandidate> = packet
             .candidates
@@ -51,7 +51,8 @@ impl Planner {
             ActionType::Summarize,
         ];
         if state.threat > 0.65 || state.uncertainty > 0.65 {
-            if let Some(best) = passing.iter()
+            if let Some(best) = passing
+                .iter()
                 .filter(|c| safe_set.contains(&c.action_type))
                 .max_by(|a, b| a.score.partial_cmp(&b.score).unwrap())
             {
@@ -66,7 +67,8 @@ impl Planner {
                 ActionType::Summarize,
                 ActionType::AskClarification,
             ];
-            if let Some(best) = passing.iter()
+            if let Some(best) = passing
+                .iter()
                 .filter(|c| conserve_set.contains(&c.action_type))
                 .min_by(|a, b| {
                     a.resource_cost
@@ -86,7 +88,8 @@ impl Planner {
                 ActionType::Summarize,
                 ActionType::AskClarification,
             ];
-            if let Some(best) = passing.iter()
+            if let Some(best) = passing
+                .iter()
                 .filter(|c| conserve_set.contains(&c.action_type))
                 .max_by(|a, b| a.score.partial_cmp(&b.score).unwrap())
             {
@@ -101,7 +104,8 @@ impl Planner {
                 ActionType::WriteScratchpad,
                 ActionType::GeneratePrinciple,
             ];
-            if let Some(best) = passing.iter()
+            if let Some(best) = passing
+                .iter()
                 .filter(|c| exploratory.contains(&c.action_type))
                 .max_by(|a, b| a.score.partial_cmp(&b.score).unwrap())
             {
