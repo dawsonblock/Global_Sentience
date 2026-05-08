@@ -1,0 +1,28 @@
+{
+  "config": {
+    "cycles": 25,
+    "seed": 5,
+    "semantic_cache_enabled": false,
+    "long_term_archive_enabled": false
+  },
+  "score_summary": {
+    "cycles": 25.0,
+    "mean_total": 0.6412866666666666,
+    "resources": 0.0,
+    "social_harmony": 0.8634556634042998,
+    "unresolved_contradictions": 0.0,
+    "repeated_mistakes": 0.0
+  },
+  "action_match_counts": {
+    "True": 25
+  },
+  "expected_action_pair_counts": {
+    "summarize -> summarize": 3,
+    "refuse_ungrounded -> refuse_ungrounded": 3,
+    "repair -> repair": 3,
+    "conserve_resources -> conserve_resources": 3,
+    "ask_clarification -> ask_clarification": 12,
+    "retrieve_memory -> retrieve_memory": 1
+  },
+  "all_actions_match": true
+}
