@@ -95,6 +95,7 @@ class GlobalWorkspaceRuntime:
 
     def run_cycle(self, text: str, source: str = "user", force_slow: bool = False) -> dict[str, Any]:
         cycle_id = self.state.next_cycle()
+        self.state.event_log.append(cycle_id, "cycle_start", {"text": text, "source": source})
         obs = self.observe(text, source)
         self._emit(cycle_id, RuntimePhase.OBSERVE, "encode", "observation", {"text": text, "source": source})
 
@@ -211,6 +212,7 @@ class GlobalWorkspaceRuntime:
         self.state.semantic_cache.set(text, selected_text, state_hint)
         self._emit(cycle_id, RuntimePhase.CONSOLIDATE, "store", "memory_write", {"episode_id": episode.episode_id, "flushed": flushed, "archive_frame_id": archive_frame_id, "principle_key": principle_key, "scratchpad_summary": self.state.scratchpad.written_summary})
 
+        self.state.event_log.append(cycle_id, "candidate_selected", {"selected_text": selected_text, "action_type": decision.action_type})
         return {
             "cycle_id": cycle_id,
             "fast_path": False,

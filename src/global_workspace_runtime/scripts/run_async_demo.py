@@ -6,7 +6,7 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1].parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from global_workspace_runtime import AsyncGlobalWorkspaceRuntime, RuntimeConfig
 

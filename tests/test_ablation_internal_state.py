@@ -1,7 +1,3 @@
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-
 from global_workspace_runtime.scripts.run_ablation import run_variant
 from global_workspace_runtime.core.config import RuntimeConfig
 

@@ -5,10 +5,6 @@ reaching 0.0 by cycle 17–20.  The CONSERVE_RESOURCES recovery bonus (+0.04)
 added in environment.apply_action() and the world_resources signal threaded
 into InternalState / Planner should keep resources above 0.25 for seed 5.
 """
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from global_workspace_runtime.simworld.runner import SimWorldRunner
 from global_workspace_runtime.simworld.environment import CooperativeSupportWorld

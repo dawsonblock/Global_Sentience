@@ -1,7 +1,3 @@
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from global_workspace_runtime.cognition import LLMAdapter, Critic, prescreen_candidates
 from global_workspace_runtime.core.types import InternalState

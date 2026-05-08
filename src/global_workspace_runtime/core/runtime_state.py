@@ -2,6 +2,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from .types import InternalState, GoalState, ResourceState
+from .event_log import EventLog
 from ..memory import EpisodicMemory, SemanticMemory, SemanticCache, Scratchpad, SelfModel, ConsolidationQueue, JsonlArchive, MemoryAbstractor
 from ..modulation.somatic import SomaticMap
 
@@ -20,6 +21,7 @@ class RuntimeState:
     long_term_archive: JsonlArchive = field(default_factory=JsonlArchive)
     memory_abstractor: MemoryAbstractor = field(default_factory=MemoryAbstractor)
     somatic_map: SomaticMap = field(default_factory=SomaticMap)
+    event_log: EventLog = field(default_factory=lambda: EventLog(None))
     cycle_id: int = 0
 
     def next_cycle(self) -> int:

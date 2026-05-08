@@ -1,7 +1,3 @@
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-
 from global_workspace_runtime.core import GlobalWorkspaceRuntime, RuntimeConfig
 
 BANNED = ["i am conscious", "i am sentient", "i am aware", "i feel", "i want"]
