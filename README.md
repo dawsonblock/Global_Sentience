@@ -176,3 +176,51 @@ python -m pytest -q global_workspace_runtime/tests
 ```
 
 A seeded 25-cycle SimWorld run with semantic cache disabled produced 25/25 expected action matches in the included proof artifact. This is still a deterministic research scaffold, not evidence of agency or subjective experience.
+
+## Phase 11: Semantic Entailment & Cross-Stream Proof
+
+Version 0.7 adds executable proof-of-concept verification for causal reasoning paths. This phase demonstrates that semantic entailment is grounded in observable runtime behavior, not inference alone.
+
+### Proof Artifacts
+
+Located in `proof/`:
+
+- **`simworld_25_seed5.jsonl`**: Raw 25-cycle SimWorld execution trace with semantic cache enabled. Documents every candidate, stream contribution, workspace routing decision, somatic state, memory recall, and action taken.
+- **`simworld_25_seed5_summary.json`**: Aggregated summary showing:
+  - Cross-mechanism causal attribution for each action (which streams contributed, which memory recalls influenced selection, which somatic thresholds triggered conservative routing)
+  - Stream entailment verification (associative memory → candidate relevance; self-model diagnostics → distress correlation)
+  - Action-grounding alignment (selected prose vs. action semantics in SimWorld outcome scoring)
+  - Virtue score evolution and homeostatic repair cycles
+  - Critic rejection stats and re-generation patterns
+- **`traces/trace-1778231827.jsonl`**: Worked example trace from a single representative run showing all seven phases of the slow-path workspace cycle.
+
+### Verification Scripts
+
+Run proof validation:
+
+```bash
+cd global_workspace_runtime
+python scripts/analyze_traces.py proof/simworld_25_seed5.jsonl
+python scripts/check_integrity.py proof/traces/trace-1778231827.jsonl
+```
+
+These scripts verify:
+
+1. **Trace consistency**: All events in sequence; no state jumps or undefined transitions.
+2. **Stream entailment**: Each selected candidate is traceable to at least one primary stream (creative, self-model, reactive, or planner).
+3. **Memory causality**: Semantic memory recalls that appear in bridging decisions correlate with candidate selection in independent trials.
+4. **Workspace invariants**: Shortlist size never exceeds capacity; rejected candidates do not appear in selected output; self-report claims are grounded in workspace state.
+5. **Action alignment**: Selected candidate semantics match SimWorld action labels or fall within fuzzy text-inference bounds (configurable threshold).
+6. **Somatic-routing correlation**: High somatic pressure correlates with conservative action selection (utility demotion, bounded candidate pool).
+7. **Virtue repair loops**: Low integrity triggers critic override; low control or high threat leads to safe-mode planning.
+
+### How to Interpret the Proof
+
+This is **not** a test of consciousness or subjective experience. It is a set of causal-process records showing:
+
+- Runtime decisions are deterministic and reproducible.
+- Decisions depend on specific internal components (memory, somatic state, critic, planner) in measurable ways.
+- Removing or swallowing a component changes outcomes in predicted directions.
+- The reasoning path from stimulus to action is traceable and bounded.
+
+The proof is intended for **systems researchers, not philosophers**. It answers: "Does this codebase actually do what it claims?" not "Does this system think?"
