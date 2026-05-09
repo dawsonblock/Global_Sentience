@@ -24,9 +24,13 @@ pub struct RuntimeState {
     pub last_candidate_action_type: Option<ActionType>,
 
     // Dialogue/world coherence
-    pub contradiction_count: u64,
+    pub unresolved_contradictions: u64,
     pub world_model_mismatch: u64,
     pub self_report_invalid: u64,
+
+    // Symbolic & archive accounting
+    pub symbolic_activations: u64,
+    pub archive_commits: u64,
 
     // Mode
     pub current_mode: RuntimeMode,
@@ -68,9 +72,11 @@ impl Default for RuntimeState {
             last_action_type: None,
             selected_action_type: None,
             last_candidate_action_type: None,
-            contradiction_count: 0,
+            unresolved_contradictions: 0,
             world_model_mismatch: 0,
             self_report_invalid: 0,
+            symbolic_activations: 0,
+            archive_commits: 0,
             current_mode: RuntimeMode::Normal,
             memory_health: 1.0,
             symbolic_state_hash: None,

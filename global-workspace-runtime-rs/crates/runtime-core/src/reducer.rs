@@ -78,9 +78,36 @@ pub fn reduce(mut state: RuntimeState, event: &RuntimeEvent) -> RuntimeState {
 
         RuntimeEvent::ErrorOccurred { .. } => {}
 
-        // symbolic stubs — no state change yet
-        RuntimeEvent::SymbolicBlendEmitted { .. } => {}
-        RuntimeEvent::ConceptCompressed { .. } => {}
+        // memory events
+        RuntimeEvent::MemoryQueried { .. } => {}
+        RuntimeEvent::MemoryHitReturned { .. } => {}
+
+        // candidate lifecycle
+        RuntimeEvent::CandidateRejected { .. } => {}
+
+        // archive
+        RuntimeEvent::ArchiveCommitted { .. } => {
+            state.archive_commits = state.archive_commits.saturating_add(1);
+        }
+
+        // contradictions
+        RuntimeEvent::ContradictionDetected { .. } => {
+            state.unresolved_contradictions = state.unresolved_contradictions.saturating_add(1);
+        }
+        RuntimeEvent::ContradictionResolved { .. } => {
+            state.unresolved_contradictions = state.unresolved_contradictions.saturating_sub(1);
+        }
+
+        // symbolic
+        RuntimeEvent::SymbolActivated { .. } => {
+            state.symbolic_activations = state.symbolic_activations.saturating_add(1);
+        }
+        RuntimeEvent::SymbolLinked { .. } => {}
+        RuntimeEvent::SymbolicTraceRecorded { .. } => {}
+        RuntimeEvent::ConceptBlendGenerated { .. } => {}
+        RuntimeEvent::PrincipleExtracted { .. } => {}
+        RuntimeEvent::SymbolicCompressionApplied { .. } => {}
+        RuntimeEvent::ResonanceScoreComputed { .. } => {}
     }
     state
 }
