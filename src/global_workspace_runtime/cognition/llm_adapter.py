@@ -5,6 +5,10 @@ from ..core.types import ActionType, InternalState, ThoughtCandidate
 from .action_grounding import action_phrase, infer_action_type
 
 
+class LLMConfigurationError(NotImplementedError):
+    """Raised when a requested adapter mode is declared but not implemented."""
+
+
 class LLMAdapter:
     def __init__(self, mode: str = "mock", model_name: str = "mock") -> None:
         if mode not in {"mock", "openai_compatible", "local"}:
@@ -13,9 +17,16 @@ class LLMAdapter:
         self.model_name = model_name
 
     def generate_candidates(self, role: str, workspace_packet: dict, memory_context: list, internal_state: InternalState, candidate_count: int) -> list[ThoughtCandidate]:
-        if self.mode != "mock":
-            # Placeholder path: keeps tests offline while preserving interface.
-            return self._mock_generate(role, workspace_packet, memory_context, internal_state, candidate_count)
+        if self.mode == "openai_compatible":
+            raise LLMConfigurationError(
+                "LLMAdapter(mode='openai_compatible') is not implemented in this repository; "
+                "use mode='mock' for deterministic offline runs."
+            )
+        if self.mode == "local":
+            raise LLMConfigurationError(
+                "LLMAdapter(mode='local') is not implemented in this repository; "
+                "use mode='mock' for deterministic offline runs."
+            )
         return self._mock_generate(role, workspace_packet, memory_context, internal_state, candidate_count)
 
     def _mock_generate(self, role: str, workspace_packet: dict, memory_context: list, internal_state: InternalState, candidate_count: int) -> list[ThoughtCandidate]:

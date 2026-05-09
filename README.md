@@ -9,9 +9,10 @@
 > more.
 >
 > **Current build constraints:**
-> - **LLM path is mock-only.** The `LLMAdapter` API accepts `openai_compatible`
->   and `local` mode strings but always calls the internal mock generator. A live
->   adapter is listed under *Next upgrades* and is not yet wired.
+> - **LLM path is mock-only.** `LLMAdapter(mode="mock")` is the supported
+>   deterministic path. `openai_compatible` and `local` are declared interface
+>   modes but currently raise configuration errors instead of silently falling
+>   back to mock generation.
 > - **Archive is plain JSONL, not Memvid.** `JsonlArchive` (née `MemvidArchive`)
 >   writes standard JSONL to `.gwlog` files. No external Memvid binary or
 >   vector database is required. A `RealMemvidBackend` protocol stub marks the
@@ -75,32 +76,41 @@ Each slow-path cycle runs:
 
 Every phase emits a trace event. Traces are written as JSONL under `artifacts/traces/`.
 
-## Run tests
+## Installation and verification
 
 ```bash
-cd global_workspace_runtime
+python -m pip install -e ".[test]"
 python -m pytest -q
+python -m global_workspace_runtime.scripts.check_action_types
+python -m global_workspace_runtime.scripts.check_sentience_claims
+python -m global_workspace_runtime.scripts.check_no_mv2 .
+python -m global_workspace_runtime.scripts.check_resource_recovery
 ```
 
-## Run the demo
+The Python runtime under `src/global_workspace_runtime/` is the current
+authoritative implementation. See `STATUS.md` and
+`docs/ARCHITECTURE_AUTHORITY.md` for authority boundaries.
+
+## Run the runtime
 
 ```bash
-cd global_workspace_runtime
-python scripts/run_demo.py
+python -m global_workspace_runtime.scripts.run_demo
+python -m global_workspace_runtime.scripts.run_ablation
+python -m global_workspace_runtime.scripts.check_integrity
+python -m global_workspace_runtime.scripts.run_simworld --cycles 25 --seed 7
 ```
 
-The demo prints internal state values, resonance tags, candidate budget, stream candidates, bridge metrics, workspace shortlist, selected candidate, rejected self-report claims, and memory write summary.
+Generated traces and memory logs are runtime outputs. They may contain user
+input and should not be committed unless sanitized into fixtures.
 
-## Run ablations
+## Trace analysis
 
 ```bash
-cd global_workspace_runtime
-python scripts/run_ablation.py
-python scripts/check_integrity.py
-python scripts/analyze_traces.py
+python -m global_workspace_runtime.scripts.analyze_traces --trace-path tests/fixtures/traces/representative-trace.jsonl
 ```
 
-Ablation artifacts are saved under `artifacts/ablation/`.
+If `--trace-path` is omitted, the analyzer defaults to the latest file in
+`artifacts/traces/`.
 
 ## How this wraps the existing bayesian_brain.py module
 
@@ -129,23 +139,23 @@ resource pressure can be measured over long runs.
 
 New components:
 
-- `simworld/`: deterministic closed-world events, simulated users, bounded
+- `src/global_workspace_runtime/simworld/`: deterministic closed-world events, simulated users, bounded
   actions and outcome scoring.
-- `modulation/somatic.py`: a 16-dimensional operational pressure map used as a
+- `src/global_workspace_runtime/modulation/somatic.py`: a 16-dimensional operational pressure map used as a
   repeatable "gut-signal" style telemetry vector.
-- `core/background_processor.py`: bounded idle work for archive recall,
+- `src/global_workspace_runtime/core/background_processor.py`: bounded idle work for archive recall,
   unresolved scratchpad review and principle abstraction.
-- `cognition/meta_critic.py`: advisory review of traces for conservatism,
+- `src/global_workspace_runtime/cognition/meta_critic.py`: advisory review of traces for conservatism,
   repeated rejection and novelty starvation.
-- `cognition/predictive_goal_model.py`: deterministic surprise/outcome
+- `src/global_workspace_runtime/cognition/predictive_goal_model.py`: deterministic surprise/outcome
   estimator for candidate actions.
-- `scripts/run_simworld.py`: runs long-term engagement trials and writes JSONL
+- `global_workspace_runtime.scripts.run_simworld`: runs long-term engagement trials and writes JSONL
   artifacts.
 
 Run SimWorld:
 
 ```bash
-python scripts/run_simworld.py --cycles 25 --seed 7
+python -m global_workspace_runtime.scripts.run_simworld --cycles 25 --seed 7
 ```
 
 The world tracks truth score, kindness score, social harmony, trust deltas,
@@ -153,7 +163,7 @@ resource stability, uncertainty resolution, repair success and cold-optimization
 penalties.
 
 
-## Corrected merged build: v0.6 Action-Grounded SimWorld Repair
+## Action-grounded SimWorld repair
 
 This merged build fixes the main v0.5 failure mode: final SimWorld actions are no longer inferred from selected prose when the runtime has an explicit action available. Candidate outputs now carry a bounded `action_type`, and SimWorld prefers that label before falling back to text scanning.
 
@@ -168,40 +178,35 @@ Key corrections:
 - Added scratchpad compaction to deduplicate and cap overflow/unresolved question buffers.
 - Added regression tests for action grounding, self-model demotion, and non-recursive SimWorld history.
 
-Proof from the corrected package:
+A seeded SimWorld run can be reproduced locally with the commands above. Do not
+infer current test counts from this README; run `python -m pytest -q` for the
+current repository state.
 
-```bash
-python -m pytest -q global_workspace_runtime/tests
-# 26 passed
-```
+## Proof fixtures
 
-A seeded 25-cycle SimWorld run with semantic cache disabled produced 25/25 expected action matches in the included proof artifact. This is still a deterministic research scaffold, not evidence of agency or subjective experience.
+Committed proof examples are curated fixtures, not live runtime output.
 
-## Phase 11: Semantic Entailment & Cross-Stream Proof
+### Python fixtures
 
-Version 0.7 adds executable proof-of-concept verification for causal reasoning paths. This phase demonstrates that semantic entailment is grounded in observable runtime behavior, not inference alone.
+- `tests/fixtures/traces/representative-trace.jsonl`: representative slow-path
+  trace fixture.
+- `tests/fixtures/proof/oracle-proof-25-seed5.json`: oracle-labeled Rust proof
+  fixture from the deterministic baseline.
 
-### Proof Artifacts
+### Rust proof mode boundary
 
-Located in `proof/`:
-
-- **`simworld_25_seed5.jsonl`**: Raw 25-cycle SimWorld execution trace with semantic cache enabled. Documents every candidate, stream contribution, workspace routing decision, somatic state, memory recall, and action taken.
-- **`simworld_25_seed5_summary.json`**: Aggregated summary showing:
-  - Cross-mechanism causal attribution for each action (which streams contributed, which memory recalls influenced selection, which somatic thresholds triggered conservative routing)
-  - Stream entailment verification (associative memory → candidate relevance; self-model diagnostics → distress correlation)
-  - Action-grounding alignment (selected prose vs. action semantics in SimWorld outcome scoring)
-  - Virtue score evolution and homeostatic repair cycles
-  - Critic rejection stats and re-generation patterns
-- **`traces/trace-1778231827.jsonl`**: Worked example trace from a single representative run showing all seven phases of the slow-path workspace cycle.
+- Oracle proofs are deterministic baselines and must be labeled `oracle`.
+- Agent proofs must be labeled `agent` and must apply the agent-selected action
+  to the world.
+- Oracle results must not be presented as runtime-agent performance.
 
 ### Verification Scripts
 
 Run proof validation:
 
 ```bash
-cd global_workspace_runtime
-python scripts/analyze_traces.py proof/simworld_25_seed5.jsonl
-python scripts/check_integrity.py proof/traces/trace-1778231827.jsonl
+python -m global_workspace_runtime.scripts.analyze_traces --trace-path tests/fixtures/traces/representative-trace.jsonl
+python -m global_workspace_runtime.scripts.check_integrity
 ```
 
 These scripts verify:
@@ -216,11 +221,13 @@ These scripts verify:
 
 ### How to Interpret the Proof
 
-This is **not** a test of consciousness or subjective experience. It is a set of causal-process records showing:
+This is **not** a test of consciousness or subjective experience. It is a set
+of causal-process records showing:
 
 - Runtime decisions are deterministic and reproducible.
 - Decisions depend on specific internal components (memory, somatic state, critic, planner) in measurable ways.
 - Removing or swallowing a component changes outcomes in predicted directions.
 - The reasoning path from stimulus to action is traceable and bounded.
 
-The proof is intended for **systems researchers, not philosophers**. It answers: "Does this codebase actually do what it claims?" not "Does this system think?"
+The proof is intended for systems researchers. It answers: "Does this codebase
+do what it claims?" not "Does this system think?"

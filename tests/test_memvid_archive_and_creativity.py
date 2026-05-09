@@ -1,8 +1,9 @@
 from pathlib import Path
+import pytest
 from global_workspace_runtime.cognition import LLMAdapter, CreativeAssociativeStream, ConceptualBlender
 from global_workspace_runtime.core import GlobalWorkspaceRuntime, RuntimeConfig
 from global_workspace_runtime.core.types import InternalState, MemoryEpisode
-from global_workspace_runtime.memory import JsonlArchive, MemoryAbstractor, EpisodicMemory, SemanticMemory
+from global_workspace_runtime.memory import ArchiveIntegrityError, JsonlArchive, MemoryAbstractor, EpisodicMemory, SemanticMemory
 
 
 def test_jsonl_archive_appends_queries_and_rewinds(tmp_path):
@@ -14,6 +15,39 @@ def test_jsonl_archive_appends_queries_and_rewinds(tmp_path):
     assert any(h["frame_id"] == f2.frame_id for h in hits)
     rewind = archive.rewind(frame_id=f1.frame_id)
     assert [f.frame_id for f in rewind] == [f1.frame_id]
+
+
+def test_jsonl_archive_reopen_and_query(tmp_path):
+    path = tmp_path / "reopen.gwlog"
+    archive = JsonlArchive(path)
+    written = archive.append_frame("Prefer evidence under ambiguity.", frame_type="principle", tags=["Fold"])
+
+    reopened = JsonlArchive(path)
+    hits = reopened.query("ambiguity evidence", limit=2)
+
+    assert hits
+    assert hits[0]["frame_id"] == written.frame_id
+
+
+def test_jsonl_archive_corrupt_line_is_explicit(tmp_path):
+    path = tmp_path / "corrupt.gwlog"
+    path.write_text('{"frame_id": "frame-1"}\nnot-json\n', encoding="utf-8")
+
+    with pytest.raises(ArchiveIntegrityError, match="Corrupt archive line"):
+        JsonlArchive(path).frames()
+
+
+def test_jsonl_archive_hash_mismatch_is_detected(tmp_path):
+    path = tmp_path / "tampered.gwlog"
+    archive = JsonlArchive(path)
+    archive.append_frame("Original text", frame_type="episode")
+
+    lines = path.read_text(encoding="utf-8").splitlines()
+    tampered = lines[0].replace("Original text", "Tampered text")
+    path.write_text(tampered + "\n", encoding="utf-8")
+
+    with pytest.raises(ArchiveIntegrityError, match="Hash mismatch"):
+        JsonlArchive(path).frames()
 
 
 def test_creative_stream_generates_memory_blending_candidates():

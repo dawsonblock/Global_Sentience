@@ -1,5 +1,5 @@
 """CI guard: assert ``ActionType`` Python enum and ``schemas/action_types.json``
-define exactly the same set of action-type values.
+define exactly the same ordered action-type values.
 
 This is a targeted schema-sync check rather than a whole-codebase string scan.
 It ensures the JSON Schema artifact stays in sync with the Python enum so that
@@ -32,26 +32,32 @@ def main() -> None:
         sys.exit(1)
 
     schema = json.loads(_SCHEMA_PATH.read_text(encoding="utf-8"))
-    schema_values: set[str] = set(schema.get("enum", []))
+    schema_values = schema.get("enum", [])
+    schema_value_set: set[str] = set(schema_values)
 
     # --- Load enum ---
-    enum_values: set[str] = {m.value for m in ActionType}
+    enum_values = [m.value for m in ActionType]
+    enum_value_set: set[str] = set(enum_values)
 
     # --- Compare ---
-    missing_from_schema = enum_values - schema_values
-    missing_from_enum = schema_values - enum_values
+    missing_from_schema = enum_value_set - schema_value_set
+    missing_from_enum = schema_value_set - enum_value_set
+    order_mismatch = enum_values != schema_values
 
-    if missing_from_schema or missing_from_enum:
+    if missing_from_schema or missing_from_enum or order_mismatch:
         print("FAIL: ActionType enum and schema/action_types.json are out of sync.")
         if missing_from_schema:
             print(f"  In enum but NOT in schema: {sorted(missing_from_schema)}")
         if missing_from_enum:
             print(f"  In schema but NOT in enum: {sorted(missing_from_enum)}")
+        if order_mismatch:
+            print(f"  Enum order : {enum_values}")
+            print(f"  Schema order: {schema_values}")
         sys.exit(1)
 
     print(
         f"PASS: ActionType enum and schema are in sync "
-        f"({len(enum_values)} values: {sorted(enum_values)})"
+        f"({len(enum_values)} values in canonical order: {enum_values})"
     )
 
 

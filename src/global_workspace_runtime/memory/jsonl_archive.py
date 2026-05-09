@@ -23,6 +23,10 @@ from typing import Any
 from ..core.types import MemoryEpisode
 
 
+class ArchiveIntegrityError(ValueError):
+    """Raised when an archive line is corrupt or the hash chain is invalid."""
+
+
 @dataclass(frozen=True)
 class MemoryFrame:
     """Immutable archival frame."""
@@ -40,6 +44,18 @@ class MemoryFrame:
 def _hash_payload(payload: dict[str, Any]) -> str:
     encoded = json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
+
+
+def _frame_payload(frame: MemoryFrame) -> dict[str, Any]:
+    return {
+        "frame_id": frame.frame_id,
+        "timestamp": frame.timestamp,
+        "frame_type": frame.frame_type,
+        "text": frame.text,
+        "tags": frame.tags,
+        "metadata": frame.metadata,
+        "parent_hash": frame.parent_hash,
+    }
 
 
 class JsonlArchive:
@@ -60,15 +76,8 @@ class JsonlArchive:
     def _load_last_hash(self) -> str:
         if not self.path.exists():
             return ""
-        last = ""
-        for line in self.path.read_text(encoding="utf-8").splitlines():
-            if not line.strip():
-                continue
-            try:
-                last = json.loads(line).get("sha256", last)
-            except json.JSONDecodeError:
-                continue
-        return last
+        frames = self.frames()
+        return frames[-1].sha256 if frames else ""
 
     def append_frame(
         self,
@@ -115,10 +124,33 @@ class JsonlArchive:
         if not self.path.exists():
             return []
         out: list[MemoryFrame] = []
-        for line in self.path.read_text(encoding="utf-8").splitlines():
+        previous_hash = ""
+        for line_number, line in enumerate(self.path.read_text(encoding="utf-8").splitlines(), start=1):
             if not line.strip():
                 continue
-            out.append(MemoryFrame(**json.loads(line)))
+            try:
+                payload = json.loads(line)
+            except json.JSONDecodeError as exc:
+                raise ArchiveIntegrityError(
+                    f"Corrupt archive line {line_number} in {self.path}: {exc.msg}"
+                ) from exc
+            try:
+                frame = MemoryFrame(**payload)
+            except TypeError as exc:
+                raise ArchiveIntegrityError(
+                    f"Corrupt archive line {line_number} in {self.path}: invalid frame payload"
+                ) from exc
+            expected_hash = _hash_payload(_frame_payload(frame))
+            if frame.sha256 != expected_hash:
+                raise ArchiveIntegrityError(
+                    f"Hash mismatch at archive line {line_number} in {self.path}"
+                )
+            if frame.parent_hash != previous_hash:
+                raise ArchiveIntegrityError(
+                    f"Hash-chain mismatch at archive line {line_number} in {self.path}"
+                )
+            previous_hash = frame.sha256
+            out.append(frame)
         return out
 
     def query(self, text: str, *, limit: int = 5, tags: list[str] | None = None) -> list[dict[str, Any]]:

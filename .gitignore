@@ -3,6 +3,12 @@ runtime/target/
 target/
 global-workspace-runtime-rs/target/
 
+# Generated runtime outputs
+artifacts/traces/*.jsonl
+artifacts/test_traces/*.jsonl
+artifacts/memory/*.gwlog
+artifacts/proof/generated-*
+
 # Python
 __pycache__/
 *.pyc

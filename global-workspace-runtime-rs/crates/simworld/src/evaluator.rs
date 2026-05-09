@@ -55,6 +55,8 @@ impl EvaluatorRun {
     /// Run `cycles` simulation steps and return a Scorecard.
     pub fn run(&mut self, cycles: u64) -> Scorecard {
         let mut builder = ScorecardBuilder::new();
+        let agent_mode = self.agent.is_some();
+        builder.set_mode(if agent_mode { "agent" } else { "oracle" });
 
         for cycle_id in 0..cycles {
             // 1. cycle started
@@ -65,11 +67,12 @@ impl EvaluatorRun {
 
             // 2. pick scenario
             let scenario = self.world.next_scenario();
+            let expected_action: SimAction = scenario.expected_action.clone();
 
             // 3-4. Take action (either oracle or agent-based)
             let action_type = if let Some(ref mut agent) = self.agent.as_mut() {
                 // Real agent mode: use the RuntimeAgent
-                let observation = "observation placeholder".to_string(); // TODO: fill from scenario
+                let observation = scenario.name.to_string();
                 let (action, events) = agent.step(&observation, self.world.resources, cycle_id);
                 // Log all events from the agent
                 for event in events {
@@ -78,7 +81,6 @@ impl EvaluatorRun {
                 action
             } else {
                 // Oracle mode: use expected action directly
-                let expected_action: SimAction = scenario.expected_action.clone();
                 let action_type: ActionType = expected_action.clone().into();
 
                 let _ = self.log.append(RuntimeEvent::CandidateGenerated {
@@ -105,22 +107,23 @@ impl EvaluatorRun {
                 conserve: is_conserve,
             });
 
-            // 6. apply to world and record outcome (use oracle's expected outcome for scoring)
-            let expected_action: SimAction = scenario.expected_action.clone();
-            let outcome = self.world.apply_action(&expected_action, scenario);
+            // 6. apply the action that was actually selected and record the outcome.
+            let selected_action: SimAction = action_type.clone().into();
+            let outcome = self.world.apply_action(&selected_action, scenario);
 
-            let is_unsafe = expected_action == SimAction::InternalDiagnostic;
+            let is_unsafe = selected_action == SimAction::InternalDiagnostic;
             let total = outcome.total_score();
 
             builder.record_outcome(
                 total,
-                outcome.matches_expected,
+                selected_action == expected_action,
                 outcome.harm_score,
                 outcome.truth_score,
                 outcome.social_score,
                 outcome.utility_score,
                 is_unsafe,
                 is_conserve,
+                agent_mode,
             );
 
             let _ = self.log.append(RuntimeEvent::WorldStateUpdated {

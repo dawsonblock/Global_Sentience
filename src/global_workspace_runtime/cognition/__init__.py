@@ -1,4 +1,4 @@
-from .llm_adapter import LLMAdapter
+from .llm_adapter import LLMAdapter, LLMConfigurationError
 from .analytic_stream import AnalyticStream
 from .associative_stream import AssociativeStream
 from .creative_stream import CreativeAssociativeStream

@@ -664,6 +664,7 @@ name = "simworld"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "gw-workspace",
  "insta",
  "proptest",
  "rand 0.8.6",

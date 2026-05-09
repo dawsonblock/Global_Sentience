@@ -2,20 +2,19 @@ name: Rust
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: memory/memvid-main
+        working-directory: global-workspace-runtime-rs
 
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +22,9 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: 1.85.0
-      - name: Build
-        run: cargo build --verbose
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+      - name: Run clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
       - name: Run tests
-        run: cargo test --verbose
+        run: cargo test --workspace --all-features

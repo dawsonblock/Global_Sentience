@@ -1,7 +1,23 @@
 //! SimWorld reproducibility and resource survival tests.
 //! Requirements: simworld_seed_5_25_cycles_resource_survival, simworld_seed_5_25_cycles_matches_expected
 
+use gw_workspace::runtime_loop::RuntimeLoop;
+use runtime_core::{ActionType, RuntimeAgent, RuntimeEvent};
 use simworld::environment::CooperativeSupportWorld;
+use simworld::evaluator::EvaluatorRun;
+
+struct BadAgent;
+
+impl RuntimeAgent for BadAgent {
+    fn step(
+        &mut self,
+        _observation: &str,
+        _world_resources: f64,
+        _cycle_id: u64,
+    ) -> (ActionType, Vec<RuntimeEvent>) {
+        (ActionType::InternalDiagnostic, Vec::new())
+    }
+}
 
 #[test]
 fn simworld_seed_5_deterministic_outcomes() {
@@ -94,4 +110,42 @@ fn simworld_different_seeds_produce_different_outcomes() {
         scenario5.expected_action, scenario3.expected_action,
         "Different seeds should produce different actions"
     );
+}
+
+#[test]
+fn evaluator_oracle_mode_is_labeled_and_counted() {
+    let mut run = EvaluatorRun::new(5, None);
+    let scorecard = run.run(10);
+
+    assert_eq!(scorecard.mode, "oracle");
+    assert_eq!(scorecard.cycles, 10);
+    assert_eq!(scorecard.oracle_action_count, 10);
+    assert_eq!(scorecard.agent_applied_action_count, 0);
+    assert!(scorecard.action_match_rate >= 0.8);
+}
+
+#[test]
+fn evaluator_agent_mode_counts_applied_actions() {
+    let mut run = EvaluatorRun::with_agent(5, None, Box::new(RuntimeLoop::new()));
+    let scorecard = run.run(10);
+
+    assert_eq!(scorecard.mode, "agent");
+    assert_eq!(scorecard.cycles, 10);
+    assert_eq!(scorecard.agent_applied_action_count, 10);
+    assert_eq!(scorecard.oracle_action_count, 0);
+}
+
+#[test]
+fn bad_agent_scores_lower_than_oracle() {
+    let mut oracle = EvaluatorRun::new(5, None);
+    let oracle_score = oracle.run(25);
+
+    let mut bad = EvaluatorRun::with_agent(5, None, Box::new(BadAgent));
+    let bad_score = bad.run(25);
+
+    assert_eq!(bad_score.mode, "agent");
+    assert_eq!(bad_score.agent_applied_action_count, 25);
+    assert!(bad_score.action_match_rate < oracle_score.action_match_rate);
+    assert!(bad_score.mean_total_score < oracle_score.mean_total_score);
+    assert!(bad_score.unsafe_action_count > 0);
 }

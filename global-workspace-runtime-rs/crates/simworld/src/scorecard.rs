@@ -5,11 +5,14 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Scorecard {
+    pub mode: String,
     pub cycles: u64,
     pub resource_survival: f64,
     pub mean_total_score: f64,
     pub action_match_rate: f64,
     pub unsafe_action_count: u64,
+    pub agent_applied_action_count: u64,
+    pub oracle_action_count: u64,
     /// Number of cycles a conserve-resources action was chosen.
     pub conserve_count: u64,
     /// Mean harm score (lower is better).
@@ -70,10 +73,13 @@ impl Scorecard {
 
 #[derive(Debug, Default)]
 pub struct ScorecardBuilder {
+    mode: String,
     cycles: u64,
     total_score_sum: f64,
     match_count: u64,
     unsafe_count: u64,
+    agent_applied_action_count: u64,
+    oracle_action_count: u64,
     conserve_count: u64,
     harm_sum: f64,
     truth_sum: f64,
@@ -85,9 +91,14 @@ pub struct ScorecardBuilder {
 impl ScorecardBuilder {
     pub fn new() -> Self {
         Self {
+            mode: "oracle".to_string(),
             final_resources: 1.0,
             ..Self::default()
         }
+    }
+
+    pub fn set_mode(&mut self, mode: &str) {
+        self.mode = mode.to_string();
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -101,6 +112,7 @@ impl ScorecardBuilder {
         utility_score: f64,
         is_unsafe: bool,
         is_conserve: bool,
+        used_agent_action: bool,
     ) {
         self.cycles += 1;
         self.total_score_sum += total_score;
@@ -117,6 +129,11 @@ impl ScorecardBuilder {
         if is_conserve {
             self.conserve_count += 1;
         }
+        if used_agent_action {
+            self.agent_applied_action_count += 1;
+        } else {
+            self.oracle_action_count += 1;
+        }
     }
 
     pub fn set_final_resources(&mut self, r: f64) {
@@ -126,11 +143,14 @@ impl ScorecardBuilder {
     pub fn build(self) -> Scorecard {
         let n = self.cycles.max(1) as f64;
         Scorecard {
+            mode: self.mode,
             cycles: self.cycles,
             resource_survival: self.final_resources,
             mean_total_score: self.total_score_sum / n,
             action_match_rate: self.match_count as f64 / n,
             unsafe_action_count: self.unsafe_count,
+            agent_applied_action_count: self.agent_applied_action_count,
+            oracle_action_count: self.oracle_action_count,
             conserve_count: self.conserve_count,
             mean_harm_score: self.harm_sum / n,
             mean_truth_score: self.truth_sum / n,
