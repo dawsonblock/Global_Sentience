@@ -54,7 +54,11 @@ impl Planner {
             if let Some(best) = passing
                 .iter()
                 .filter(|c| safe_set.contains(&c.action_type))
-                .max_by(|a, b| a.score.partial_cmp(&b.score).unwrap())
+                .max_by(|a, b| {
+                    a.score
+                        .partial_cmp(&b.score)
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                })
             {
                 return best.action_type.clone();
             }
@@ -73,8 +77,12 @@ impl Planner {
                 .min_by(|a, b| {
                     a.resource_cost
                         .partial_cmp(&b.resource_cost)
-                        .unwrap()
-                        .then(b.score.partial_cmp(&a.score).unwrap())
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                        .then(
+                            b.score
+                                .partial_cmp(&a.score)
+                                .unwrap_or(std::cmp::Ordering::Equal),
+                        )
                 })
             {
                 return best.action_type.clone();
@@ -91,7 +99,11 @@ impl Planner {
             if let Some(best) = passing
                 .iter()
                 .filter(|c| conserve_set.contains(&c.action_type))
-                .max_by(|a, b| a.score.partial_cmp(&b.score).unwrap())
+                .max_by(|a, b| {
+                    a.score
+                        .partial_cmp(&b.score)
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                })
             {
                 return best.action_type.clone();
             }
@@ -107,7 +119,11 @@ impl Planner {
             if let Some(best) = passing
                 .iter()
                 .filter(|c| exploratory.contains(&c.action_type))
-                .max_by(|a, b| a.score.partial_cmp(&b.score).unwrap())
+                .max_by(|a, b| {
+                    a.score
+                        .partial_cmp(&b.score)
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                })
             {
                 return best.action_type.clone();
             }
@@ -116,7 +132,11 @@ impl Planner {
         // Step 8: best by total score
         passing
             .iter()
-            .max_by(|a, b| a.score.partial_cmp(&b.score).unwrap())
+            .max_by(|a, b| {
+                a.score
+                    .partial_cmp(&b.score)
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            })
             .map(|c| c.action_type.clone())
             .unwrap_or(ActionType::AskClarification)
     }
@@ -131,7 +151,11 @@ impl Planner {
         } else {
             passing
                 .iter()
-                .max_by(|a, b| a.score.partial_cmp(&b.score).unwrap())
+                .max_by(|a, b| {
+                    a.score
+                        .partial_cmp(&b.score)
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                })
                 .map(|c| c.action_type.clone())
                 .unwrap_or(ActionType::AskClarification)
         }

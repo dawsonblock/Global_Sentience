@@ -3,6 +3,20 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+// --- Archive backends ---
+pub mod archive;
+pub mod jsonl_archive;
+pub mod memvid_backend;
+
+// --- Claims and contradiction detection ---
+pub mod claim;
+
+// Re-export key types
+pub use archive::{ArchiveBackend, ArchiveError};
+pub use claim::{ClaimStatus, Contradiction, Evidence, MemoryClaim, MemoryStatus, RetrievalPacket};
+pub use jsonl_archive::JsonlArchiveBackend;
+pub use memvid_backend::MemvidBackend;
+
 /// Lightweight semantic memory seeded with humanity context.
 #[derive(Debug, Default)]
 pub struct SemanticMemory {

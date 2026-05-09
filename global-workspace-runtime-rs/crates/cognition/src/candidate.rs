@@ -55,6 +55,10 @@ impl CandidatePacket {
         self.candidates
             .iter()
             .filter(|c| c.passes_critic)
-            .max_by(|a, b| a.score.partial_cmp(&b.score).unwrap())
+            .max_by(|a, b| {
+                a.score
+                    .partial_cmp(&b.score)
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            })
     }
 }

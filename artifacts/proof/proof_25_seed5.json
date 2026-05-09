@@ -1,0 +1,14 @@
+{
+  "proof": {
+    "cycles": 25,
+    "metrics": {
+      "action_match_rate": 1.0,
+      "mean_harm_score": 0.020000000000000004,
+      "mean_total_score": 0.8266666666666667,
+      "resource_survival": 1.0
+    },
+    "passed": true,
+    "seed": 5,
+    "timestamp": "2026-05-09T03:02:47.775397+00:00"
+  }
+}

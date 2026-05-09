@@ -1,5 +1,5 @@
 [package]
-name        = "runtime-cli"
+name = "runtime-cli"
 version.workspace = true
 edition.workspace = true
 
@@ -9,11 +9,12 @@ path = "src/main.rs"
 
 [dependencies]
 runtime-core = { path = "../runtime-core" }
-simworld     = { path = "../simworld" }
-modulation   = { path = "../modulation" }
-cognition    = { path = "../cognition" }
-symbolic     = { path = "../symbolic" }
-memory       = { path = "../memory" }
+simworld = { path = "../simworld" }
+modulation = { path = "../modulation" }
+cognition = { path = "../cognition" }
+symbolic = { path = "../symbolic" }
+memory = { path = "../memory" }
 gw-workspace = { path = "../gw-workspace" }
-serde_json   = { workspace = true }
-anyhow       = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+chrono = { workspace = true }

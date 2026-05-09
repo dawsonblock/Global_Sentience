@@ -218,6 +218,10 @@ dependencies = [
 name = "gw-workspace"
 version = "0.1.0"
 dependencies = [
+ "chrono",
+ "cognition",
+ "memory",
+ "modulation",
  "runtime-core",
  "serde",
  "serde_json",
@@ -542,6 +546,7 @@ name = "runtime-cli"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "chrono",
  "cognition",
  "gw-workspace",
  "memory",

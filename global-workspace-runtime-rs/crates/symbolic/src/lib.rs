@@ -3,6 +3,42 @@
 use runtime_core::ActionType;
 use serde::{Deserialize, Serialize};
 
+// --- Core symbolic types ---
+pub mod symbol;
+pub mod symbol_graph;
+pub mod symbolic_frame;
+pub mod symbolic_trace;
+
+// --- Symbolic streams ---
+pub mod analytic_stream;
+pub mod associative_stream;
+pub mod conceptual_blender;
+pub mod creative_stream;
+
+// --- Symbolic operations ---
+pub mod abstraction;
+pub mod compression;
+pub mod glyph;
+pub mod principle;
+pub mod resonance;
+pub mod symbolic_memory;
+
+// Re-export key types
+pub use abstraction::Abstraction;
+pub use analytic_stream::AnalyticStream;
+pub use associative_stream::AssociativeStream;
+pub use compression::{CompressionStats, SymbolicCompression};
+pub use conceptual_blender::ConceptBlend;
+pub use creative_stream::CreativeStream;
+pub use glyph::Glyph;
+pub use principle::Principle;
+pub use resonance::ResonanceScore;
+pub use symbol::{Symbol, SymbolActivation, SymbolId, SymbolKind};
+pub use symbol_graph::SymbolGraph;
+pub use symbolic_frame::SymbolicFrame;
+pub use symbolic_memory::SymbolicMemoryTag;
+pub use symbolic_trace::SymbolicTrace;
+
 /// A blended thought produced by combining memory context with the current problem.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BlendedCandidate {

@@ -4,6 +4,10 @@ use runtime_core::InternalState;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
+// --- Runtime Pipeline ---
+pub mod runtime_loop;
+pub use runtime_loop::RuntimeLoop;
+
 // ─── Capsule ─────────────────────────────────────────────────────────────────
 
 /// A unit of content competing for workspace broadcast.
