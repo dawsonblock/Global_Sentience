@@ -75,6 +75,17 @@ def test_event_log_empty_payload_default():
     assert evt.payload == {}
 
 
+def test_event_log_rejects_unknown_action_type() -> None:
+    log = EventLog(path=None)
+
+    try:
+        log.append(1, "candidate_selected", {"action_type": "definitely_not_real"})
+    except ValueError as exc:
+        assert "known action_type" in str(exc)
+    else:
+        raise AssertionError("candidate_selected should reject unknown action types")
+
+
 # ---------------------------------------------------------------------------
 # Integration test: EventLog emits cycle_start + candidate_selected via runtime
 # ---------------------------------------------------------------------------

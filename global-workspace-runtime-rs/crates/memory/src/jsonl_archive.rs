@@ -14,9 +14,9 @@ impl JsonlArchiveBackend {
     pub fn new(path: PathBuf) -> Result<Self, ArchiveError> {
         let ext = path.extension().and_then(|s| s.to_str()).unwrap_or("");
         if ext == "mv2" {
-            return Err(ArchiveError::ExtensionRejected(format!(
-                ".mv2 not allowed; use .gwlog or .jsonl instead"
-            )));
+            return Err(ArchiveError::ExtensionRejected(
+                ".mv2 not allowed; use .gwlog or .jsonl instead".to_string(),
+            ));
         }
         if ext != "gwlog" && ext != "jsonl" {
             return Err(ArchiveError::ExtensionRejected(format!(

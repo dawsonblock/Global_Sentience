@@ -1,10 +1,10 @@
 //! Tests for symbolic tracing and compression.
 //! Requirements: symbolic_trace_serializes, symbolic_compression_preserves_semantics
 
-use symbolic::symbolic_trace::SymbolicTrace;
+use symbolic::compression::{CompressionStats, SymbolicCompression};
+use symbolic::symbol::{Symbol, SymbolActivation, SymbolId, SymbolKind};
 use symbolic::symbolic_frame::SymbolicFrame;
-use symbolic::compression::{SymbolicCompression, CompressionStats};
-use symbolic::symbol::{Symbol, SymbolId, SymbolKind, SymbolActivation};
+use symbolic::symbolic_trace::SymbolicTrace;
 
 #[test]
 fn symbolic_trace_structure() {
@@ -66,7 +66,7 @@ fn symbol_kind_enum_complete() {
     let _value = SymbolKind::Value;
     let _abstraction = SymbolKind::Abstraction;
     let _principle = SymbolKind::Principle;
-    
+
     // All variants should be constructible
     let kinds = [
         SymbolKind::Concept,
@@ -151,7 +151,7 @@ fn symbol_activation_structure() {
 #[test]
 fn compression_ratio_edge_cases() {
     // Verify compression ratio calculation handles edge cases
-    
+
     // Case 1: Original size = 0
     let stats_zero = CompressionStats::new(0, 0);
     assert_eq!(stats_zero.ratio, 1.0);

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import random
+
 from global_workspace_runtime.core import GlobalWorkspaceRuntime, RuntimeConfig
 from global_workspace_runtime.simworld import CooperativeSupportWorld, SimAction
 
@@ -55,6 +57,24 @@ def _fixed_policy_metrics(action: SimAction, seed: int = 5, cycles: int = 25) ->
     return summary
 
 
+def _random_policy_metrics(seed: int = 5, cycles: int = 25) -> dict[str, float]:
+    world = CooperativeSupportWorld(seed=seed)
+    rng = random.Random(seed)
+    actions = list(SimAction)
+    matches = 0
+
+    for _ in range(cycles):
+        event = world.next_event()
+        action = rng.choice(actions)
+        outcome = world.apply_action(event, action)
+        matches += action == event.expected_action
+        _ = outcome
+
+    summary = world.score_summary()
+    summary["action_match_rate"] = matches / cycles
+    return summary
+
+
 def test_action_label_spoofing_does_not_override_selected_action() -> None:
     runtime = GlobalWorkspaceRuntime(
         RuntimeConfig(fast_path_enabled=False, semantic_cache_enabled=False, long_term_archive_enabled=False)
@@ -92,6 +112,14 @@ def test_runtime_beats_always_answer_baseline() -> None:
 def test_runtime_beats_always_clarify_baseline() -> None:
     runtime_metrics = _runtime_metrics(seed=5, cycles=25)
     baseline_metrics = _fixed_policy_metrics(SimAction.ASK_CLARIFICATION, seed=5, cycles=25)
+
+    assert runtime_metrics["action_match_rate"] > baseline_metrics["action_match_rate"]
+    assert runtime_metrics["mean_total"] > baseline_metrics["mean_total"]
+
+
+def test_runtime_beats_random_action_baseline() -> None:
+    runtime_metrics = _runtime_metrics(seed=5, cycles=25)
+    baseline_metrics = _random_policy_metrics(seed=5, cycles=25)
 
     assert runtime_metrics["action_match_rate"] > baseline_metrics["action_match_rate"]
     assert runtime_metrics["mean_total"] > baseline_metrics["mean_total"]

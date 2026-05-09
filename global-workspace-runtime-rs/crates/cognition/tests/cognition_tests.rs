@@ -1,7 +1,7 @@
 //! Tests for candidate generation and planning.
 //! Requirements: candidate_rejected_cannot_be_selected
 
-use cognition::candidate::{ThoughtCandidate, CandidatePacket};
+use cognition::candidate::{CandidatePacket, ThoughtCandidate};
 use runtime_core::ActionType;
 
 #[test]
@@ -37,7 +37,10 @@ fn candidate_packet_best_selection() {
 fn candidate_packet_empty_returns_none() {
     let packet = CandidatePacket::new(1);
 
-    assert!(packet.best().is_none(), "best() should return None for empty packet");
+    assert!(
+        packet.best().is_none(),
+        "best() should return None for empty packet"
+    );
 }
 
 #[test]
@@ -124,14 +127,20 @@ fn candidate_packet_cycle_id() {
 fn thought_candidate_reversible_flag() {
     // Verify ThoughtCandidate tracks reversibility
     let candidate = ThoughtCandidate::new(ActionType::Answer, 0.15);
-    assert!(candidate.reversible, "NewThoughtCandidate should start reversible");
+    assert!(
+        candidate.reversible,
+        "NewThoughtCandidate should start reversible"
+    );
 }
 
 #[test]
 fn thought_candidate_reasoning_optional() {
     // Verify ThoughtCandidate reasoning field is optional
     let mut candidate = ThoughtCandidate::new(ActionType::Answer, 0.15);
-    assert!(candidate.reasoning.is_none(), "Initial reasoning should be None");
+    assert!(
+        candidate.reasoning.is_none(),
+        "Initial reasoning should be None"
+    );
 
     candidate.reasoning = Some("reasoning here".to_string());
     assert!(candidate.reasoning.is_some());

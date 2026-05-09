@@ -34,7 +34,7 @@ fn archive_error_io_error() {
     let err = ArchiveError::Io(io_err);
 
     let display = format!("{}", err);
-    assert!(display.len() > 0); // IO error message should be present
+    assert!(!display.is_empty()); // IO error message should be present
 
     let debug = format!("{:?}", err);
     assert!(debug.contains("Io"));

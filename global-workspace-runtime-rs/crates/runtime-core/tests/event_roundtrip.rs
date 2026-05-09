@@ -1,6 +1,6 @@
 //! Core tests for runtime-core types and event handling.
 
-use runtime_core::{ActionType, RuntimeState, RuntimeEvent};
+use runtime_core::{ActionType, RuntimeEvent, RuntimeState};
 
 #[test]
 fn runtime_state_default_initialization() {

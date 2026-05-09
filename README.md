@@ -41,7 +41,7 @@ This upgraded version adds:
 - Top-K prescreen: candidate streams discard weak candidates before workspace routing.
 - Async-style consolidation queue: user-facing selection happens before memory consolidation is flushed.
 - Semantic cache: repeated or similar prompts can reuse previous selected candidates.
-- Architecture integrity checker: scripts/check_integrity.py validates trace, shortlist, scratchpad, self-report, memory, stream, and state influence invariants.
+- Architecture integrity checker: `python -m global_workspace_runtime.scripts.check_integrity` validates trace, shortlist, scratchpad, self-report, memory, stream, and state influence invariants.
 
 
 ## Memory and creativity upgrade

@@ -17,9 +17,20 @@ fn action_schema_matches_json() {
         .as_array()
         .expect("schema enum must be an array")
         .iter()
-        .map(|value| value.as_str().expect("enum values must be strings").to_string())
+        .map(|value| {
+            value
+                .as_str()
+                .expect("enum values must be strings")
+                .to_string()
+        })
         .collect();
-    let rust_values: Vec<String> = ActionType::all_strs().iter().map(|value| (*value).to_string()).collect();
+    let rust_values: Vec<String> = ActionType::all_strs()
+        .iter()
+        .map(|value| (*value).to_string())
+        .collect();
 
-    assert_eq!(rust_values, schema_values, "Rust ActionType must match schemas/action_types.json exactly");
+    assert_eq!(
+        rust_values, schema_values,
+        "Rust ActionType must match schemas/action_types.json exactly"
+    );
 }

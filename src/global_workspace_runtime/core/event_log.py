@@ -19,6 +19,8 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
+from .types import ActionType
+
 _DEFAULT_PATH = "artifacts/events/runtime.evlog"
 
 
@@ -86,12 +88,20 @@ class EventLog:
         RuntimeEvent
             The newly created event (already stored).
         """
+        payload = payload or {}
+        if event_type == "candidate_selected":
+            action_type = payload.get("action_type")
+            valid_action_types = {action.value for action in ActionType}
+            if action_type not in valid_action_types:
+                raise ValueError(
+                    f"candidate_selected requires a known action_type, got {action_type!r}"
+                )
         evt = RuntimeEvent(
             event_id=f"ev-{uuid.uuid4().hex[:12]}",
             cycle_id=cycle_id,
             event_type=event_type,
             timestamp=time.time(),
-            payload=payload or {},
+            payload=payload,
         )
         self._events.append(evt)
         if self._path is not None:

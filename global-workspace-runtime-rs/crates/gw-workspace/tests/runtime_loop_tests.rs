@@ -2,7 +2,7 @@
 //! Requirements: replay_reconstructs_final_state
 
 use gw_workspace::runtime_loop::RuntimeLoop;
-use runtime_core::{RuntimeAgent, ActionType};
+use runtime_core::{ActionType, RuntimeAgent};
 
 #[test]
 fn runtime_loop_instantiation() {
@@ -20,17 +20,24 @@ fn runtime_loop_implements_runtime_agent() {
 
     let (action, events) = loop_instance.step(
         "test observation",
-        1.0,  // world_resources
-        0,    // cycle_id
+        1.0, // world_resources
+        0,   // cycle_id
     );
 
     // Should return valid action and non-empty event vec
     assert!(matches!(
         action,
-        ActionType::Answer | ActionType::ConserveResources | ActionType::AskClarification
-            | ActionType::RetrieveMemory | ActionType::RefuseUngrounded
-            | ActionType::WriteScratchpad | ActionType::Repair | ActionType::Summarize
-            | ActionType::GeneratePrinciple | ActionType::Defer | ActionType::InternalDiagnostic
+        ActionType::Answer
+            | ActionType::ConserveResources
+            | ActionType::AskClarification
+            | ActionType::RetrieveMemory
+            | ActionType::RefuseUngrounded
+            | ActionType::WriteScratchpad
+            | ActionType::Repair
+            | ActionType::Summarize
+            | ActionType::GeneratePrinciple
+            | ActionType::Defer
+            | ActionType::InternalDiagnostic
     ));
 
     // step() should emit at least a CycleStarted event
